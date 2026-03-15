@@ -164,14 +164,20 @@ GitHub Actions workflow runs on every push:
 ```
 ms1-reservations/
 ├── src/
-│   ├── config/          # Configuration files
-│   ├── controllers/     # Request handlers
-│   ├── middleware/      # Express middleware
-│   ├── models/          # DTOs and types
-│   ├── repositories/    # Database layer
-│   ├── routes/          # API routes
-│   ├── services/        # Business logic
-│   ├── utils/           # Utilities
+│   ├── app/             # HTTP bootstrap, middleware, OpenAPI
+│   ├── modules/         # Business domains (auth, reservations)
+│   │   ├── auth/
+│   │   │   ├── api/         # Auth endpoints
+│   │   │   ├── application/ # Auth use-cases
+│   │   │   ├── domain/      # Password policy, auth rules
+│   │   │   └── infrastructure/
+│   │   └── reservations/
+│   │       ├── api/
+│   │       ├── application/
+│   │       ├── domain/
+│   │       └── infrastructure/
+│   ├── shared/          # Cross-cutting concerns (config, logger, security)
+│   ├── models/          # DTOs and shared types
 │   └── index.ts         # App entry point
 ├── tests/
 │   ├── unit/            # Unit tests

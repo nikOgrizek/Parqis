@@ -1,11 +1,11 @@
-import { AuthService } from '../../../src/services/auth.service';
-import { UserRepository } from '../../../src/repositories/user.repository';
-import { PasswordUtil } from '../../../src/utils/password.util';
-import { AppError } from '../../../src/middleware/error.middleware';
+import { AuthService } from '../../../src/modules/auth/application/auth.service';
+import { UserRepository } from '../../../src/modules/auth/infrastructure/user.repository.prisma';
+import { PasswordUtil } from '../../../src/shared/security/password.util';
+import { AppError } from '../../../src/app/http/middlewares/error.middleware';
 import { UserRole } from '@prisma/client';
 
-jest.mock('../../../src/repositories/user.repository');
-jest.mock('../../../src/utils/password.util');
+jest.mock('../../../src/modules/auth/infrastructure/user.repository.prisma');
+jest.mock('../../../src/shared/security/password.util');
 
 describe('AuthService', () => {
   let authService: AuthService;

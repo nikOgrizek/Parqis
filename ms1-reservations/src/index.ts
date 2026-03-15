@@ -4,15 +4,14 @@ import cors from 'cors';
 import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import path from 'path';
-import { env } from './config/env';
-import { logger, loggerStream } from './utils/logger';
-import routes from './routes';
-import { errorHandler, notFoundHandler } from './middleware/error.middleware';
-import { prisma } from './config/database';
-import { kafkaConfig } from './config/kafka';
+import { env } from './shared/config/env';
+import { logger, loggerStream } from './shared/observability/logger';
+import routes from './app/http/routes';
+import { errorHandler, notFoundHandler } from './app/http/middlewares/error.middleware';
+import { prisma } from './shared/infrastructure/database/prisma.client';
+import { kafkaConfig } from './shared/infrastructure/messaging/kafka.config';
+import { buildSwaggerSpec } from './app/docs/openapi';
 
 const app: Application = express();
 
@@ -41,52 +40,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Swagger documentation
-const swaggerApiFiles = [
-  path.join(__dirname, 'routes', '*.ts').replace(/\\/g, '/'),
-  path.join(__dirname, 'routes', '*.js').replace(/\\/g, '/'),
-  path.join(process.cwd(), 'src', 'routes', '*.ts').replace(/\\/g, '/'),
-  path.join(process.cwd(), 'dist', 'routes', '*.js').replace(/\\/g, '/'),
-];
-
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Parqis Reservations API',
-      version: '1.0.0',
-      description: 'Microservice for managing parking reservations',
-      contact: {
-        name: 'Parqis Team',
-      },
-    },
-    servers: [
-      {
-        url: `http://localhost:${env.PORT}`,
-        description: 'Development server',
-      },
-    ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'Enter JWT token',
-        },
-        apiKey: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'X-API-Key',
-          description: 'Internal API key for microservice communication',
-        },
-      },
-    },
-  },
-  apis: swaggerApiFiles,
-};
-
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
+const swaggerSpec = buildSwaggerSpec();
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API routes

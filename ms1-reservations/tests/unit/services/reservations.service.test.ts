@@ -1,17 +1,17 @@
-import { ReservationsService } from '../../../src/services/reservations.service';
-import { ReservationRepository } from '../../../src/repositories/reservation.repository';
-import { UserRepository } from '../../../src/repositories/user.repository';
-import { KafkaService } from '../../../src/services/kafka.service';
+import { ReservationsService } from '../../../src/modules/reservations/application/reservations.service';
+import { ReservationRepository } from '../../../src/modules/reservations/infrastructure/reservation.repository.prisma';
+import { UserRepository } from '../../../src/modules/auth/infrastructure/user.repository.prisma';
+import { KafkaEventsPublisher } from '../../../src/shared/infrastructure/messaging/kafka-events.publisher';
 
-jest.mock('../../../src/repositories/reservation.repository');
-jest.mock('../../../src/repositories/user.repository');
-jest.mock('../../../src/services/kafka.service');
+jest.mock('../../../src/modules/reservations/infrastructure/reservation.repository.prisma');
+jest.mock('../../../src/modules/auth/infrastructure/user.repository.prisma');
+jest.mock('../../../src/shared/infrastructure/messaging/kafka-events.publisher');
 
 describe('ReservationsService', () => {
   let reservationsService: ReservationsService;
   let mockReservationRepository: jest.Mocked<ReservationRepository>;
   let mockUserRepository: jest.Mocked<UserRepository>;
-  let mockKafkaService: jest.Mocked<KafkaService>;
+  let mockKafkaService: jest.Mocked<KafkaEventsPublisher>;
 
   beforeEach(() => {
     reservationsService = new ReservationsService();

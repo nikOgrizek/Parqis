@@ -47,8 +47,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: ms1-reservations/package-lock.json
 
       - name: Install dependencies
         working-directory: ./ms1-reservations

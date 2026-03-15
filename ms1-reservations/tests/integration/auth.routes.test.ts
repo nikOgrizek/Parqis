@@ -1,8 +1,8 @@
 import request from 'supertest';
 import express, { Application } from 'express';
-import authRoutes from '../../src/routes/auth.routes';
-import { AuthService } from '../../src/services/auth.service';
-import { AppError } from '../../src/middleware/error.middleware';
+import authRoutes from '../../src/modules/auth/api/auth.routes';
+import { AuthService } from '../../src/modules/auth/application/auth.service';
+import { AppError } from '../../src/app/http/middlewares/error.middleware';
 
 const app: Application = express();
 app.use(express.json());

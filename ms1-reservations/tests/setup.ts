@@ -1,5 +1,5 @@
 // Mock Prisma Client for tests
-jest.mock('../src/config/database', () => ({
+jest.mock('../src/shared/infrastructure/database/prisma.client', () => ({
   prisma: {
     user: {
       create: jest.fn(),
@@ -34,7 +34,7 @@ jest.mock('../src/config/database', () => ({
 }));
 
 // Mock Kafka for tests
-jest.mock('../src/config/kafka', () => ({
+jest.mock('../src/shared/infrastructure/messaging/kafka.config', () => ({
   kafkaConfig: {
     getProducer: jest.fn().mockResolvedValue({
       connect: jest.fn(),
@@ -52,7 +52,7 @@ jest.mock('../src/config/kafka', () => ({
 }));
 
 // Mock logger for cleaner test output
-jest.mock('../src/utils/logger', () => ({
+jest.mock('../src/shared/observability/logger', () => ({
   logger: {
     info: jest.fn(),
     warn: jest.fn(),

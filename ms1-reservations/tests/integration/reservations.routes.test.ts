@@ -1,9 +1,9 @@
 import request from 'supertest';
 import express, { Application } from 'express';
-import reservationsRoutes from '../../src/routes/reservations.routes';
-import { JwtUtil } from '../../src/utils/jwt.util';
-import { ReservationsService } from '../../src/services/reservations.service';
-import { AppError } from '../../src/middleware/error.middleware';
+import reservationsRoutes from '../../src/modules/reservations/api/reservations.routes';
+import { JwtUtil } from '../../src/shared/security/jwt.util';
+import { ReservationsService } from '../../src/modules/reservations/application/reservations.service';
+import { AppError } from '../../src/app/http/middlewares/error.middleware';
 
 const app: Application = express();
 app.use(express.json());

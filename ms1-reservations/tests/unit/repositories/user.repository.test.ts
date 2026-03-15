@@ -1,5 +1,5 @@
-import { UserRepository } from '../../../src/repositories/user.repository';
-import { prisma } from '../../../src/config/database';
+import { UserRepository } from '../../../src/modules/auth/infrastructure/user.repository.prisma';
+import { prisma } from '../../../src/shared/infrastructure/database/prisma.client';
 
 describe('UserRepository', () => {
   let userRepository: UserRepository;

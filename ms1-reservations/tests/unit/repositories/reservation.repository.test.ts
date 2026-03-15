@@ -1,5 +1,5 @@
-import { ReservationRepository } from '../../../src/repositories/reservation.repository';
-import { prisma } from '../../../src/config/database';
+import { ReservationRepository } from '../../../src/modules/reservations/infrastructure/reservation.repository.prisma';
+import { prisma } from '../../../src/shared/infrastructure/database/prisma.client';
 import { ReservationStatus } from '@prisma/client';
 
 describe('ReservationRepository', () => {
