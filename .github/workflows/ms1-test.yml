@@ -139,6 +139,7 @@ jobs:
           context: ./ms1-reservations
           file: ./ms1-reservations/Dockerfile
           push: false
+          load: true
           tags: parqis-ms1-reservations:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
