@@ -19,6 +19,26 @@ services:
     networks:
       - parqis-network
 
+  # PostgreSQL Database for MS2
+  postgres-ms2:
+    image: postgres:15-alpine
+    container_name: parqis-postgres-ms2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: parking_spots
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-ms2-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - parqis-network
+
   # Zookeeper for Kafka
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -113,6 +133,44 @@ services:
     networks:
       - parqis-network
 
+  # MS2 - Parking Spots Microservice
+  ms2-parking-spots:
+    build:
+      context: ./ms2-parking-spots
+      dockerfile: Dockerfile
+    container_name: parqis-ms2-parking-spots
+    ports:
+      - "8000:8000"
+      - "50051:50051"
+    environment:
+      APP_ENV: production
+      APP_PORT: 8000
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: 50051
+      DATABASE_URL: postgresql://postgres:postgres@postgres-ms2:5432/parking_spots
+      REDIS_URL: redis://redis:6379/0
+      API_KEY: ${MS2_API_KEY:-ms2-internal-api-key-change-me}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_CLIENT_ID: ms2-parking-spots
+      KAFKA_GROUP_ID: ms2-parking-spots-group
+      KAFKA_RESERVATIONS_TOPIC: reservations
+      KAFKA_SPOT_UPDATES_TOPIC: spot-updates
+      LOG_LEVEL: info
+    depends_on:
+      postgres-ms2:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 25s
+    restart: unless-stopped
+    networks:
+      - parqis-network
+
   # Kafka UI (optional - for development/debugging)
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -132,6 +190,8 @@ services:
 
 volumes:
   postgres-ms1-data:
+    driver: local
+  postgres-ms2-data:
     driver: local
   redis-data:
     driver: local

@@ -16,7 +16,7 @@ Parqis je digitalni sistem za upravljanje parkirišč, ki omogoča rezervacijo p
 
 Sistem sestavljajo **3 mikrostoritve**:
 - **MS1 - Rezervacije** (Node.js/Express) - upravljanje rezervacij in uporabnikov ✅
-- **MS2 - Parkirna mesta** (Python/FastAPI) - upravljanje inventarja mest ⏳
+- **MS2 - Parkirna mesta** (Python/FastAPI) - upravljanje inventarja mest ✅
 - **MS3 - Validacija** (Java/Spring Boot) - validacija vstopov/izstopov ⏳
 
 **Komunikacija:**
@@ -56,6 +56,7 @@ docker-compose logs -f ms1-reservations
 
 **Dostop:**
 - MS1 API: http://localhost:3000
+- MS2 API: http://localhost:8000
 - Swagger UI: http://localhost:3000/api-docs
 - Health check: http://localhost:3000/api/health
 
@@ -107,11 +108,15 @@ docker-compose exec ms1-reservations npm test
 - ✅ GitHub Actions CI/CD
 - ✅ Docker Compose setup
 
-### ⏳ MS2 - Parkirna mesta (PLANNED)
-- Upravljanje inventarja parkirišč in mest
-- Real-time zasedenost (Redis cache)
-- gRPC server za hitro komunikacijo
-- Kafka consumer/producer
+### ✅ MS2 - Parkirna mesta (COMPLETED)
+- ✅ Screaming architecture po domenah (`PARKING_LOTS`, `SPOT_ALLOCATION`, `OCCUPANCY`)
+- ✅ REST API za parkirišča, mesta in zasedenost
+- ✅ API key zaščita za interne endpoint-e
+- ✅ gRPC servis (`CheckAvailability`, `ReserveSpot`, `ReleaseSpot`)
+- ✅ Kafka consumer/producer za event messaging
+- ✅ Structured JSON logiranje
+- ✅ Unit testi (pytest)
+- ✅ Dockerfile in docker-compose integracija
 
 ### ⏳ MS3 - Validacija (PLANNED)
 - OCR prepoznavanje registrskih oznak

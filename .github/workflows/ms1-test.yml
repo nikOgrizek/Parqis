@@ -2,16 +2,10 @@ name: MS1 Reservations - Tests
 
 on:
   push:
-    branches:
-      - main
-      - develop
     paths:
       - 'ms1-reservations/**'
       - '.github/workflows/ms1-test.yml'
   pull_request:
-    branches:
-      - main
-      - develop
     paths:
       - 'ms1-reservations/**'
 

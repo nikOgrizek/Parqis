@@ -1,0 +1,83 @@
+name: MS2 Parking Spots - Tests
+
+on:
+  push:
+    paths:
+      - 'ms2-parking-spots/**'
+      - '.github/workflows/ms2-test.yml'
+  pull_request:
+    paths:
+      - 'ms2-parking-spots/**'
+      - '.github/workflows/ms2-test.yml'
+
+jobs:
+  test:
+    name: Run MS2 tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: parking_spots_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: ./ms2-parking-spots
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        working-directory: ./ms2-parking-spots
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/parking_spots_ci
+          REDIS_URL: redis://localhost:6379/0
+          APP_ENV: test
+          LOG_LEVEL: INFO
+        run: python -m pytest -q
+
+      - name: Verify app imports
+        working-directory: ./ms2-parking-spots
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/parking_spots_ci
+          REDIS_URL: redis://localhost:6379/0
+          APP_ENV: test
+          LOG_LEVEL: INFO
+        run: python -c "import app.main; print('MS2 import OK')"
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ms2-parking-spots
+          file: ./ms2-parking-spots/Dockerfile
+          push: false
+          load: true
+          tags: parqis-ms2-parking-spots:test
