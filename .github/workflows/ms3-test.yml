@@ -67,5 +67,5 @@ jobs:
 
       - name: Test Docker image
         run: |
-          docker run --rm parqis-ms3-validation:test java -version
+          docker run --rm --entrypoint java parqis-ms3-validation:test -version
           echo "Docker image test successful"
