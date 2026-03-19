@@ -92,17 +92,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and optionally push Docker image
+      - name: Build and push Docker image (push only)
+        if: ${{ github.event_name == 'push' }}
         uses: docker/build-push-action@v5
         with:
           context: ./ms2-parking-spots
           file: ./ms2-parking-spots/Dockerfile
-          push: ${{ github.event_name == 'push' }}
-          load: ${{ github.event_name != 'push' }}
+          push: true
+          load: false
           tags: |
-            parqis-ms2-parking-spots:test
             nikogrizek/parqis-ms2-parking-spots:latest
             nikogrizek/parqis-ms2-parking-spots:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Docker image for PR smoke test
+        if: ${{ github.event_name != 'push' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ms2-parking-spots
+          file: ./ms2-parking-spots/Dockerfile
+          push: false
+          load: true
+          tags: parqis-ms2-parking-spots:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
