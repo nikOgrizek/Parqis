@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package parqis.ms2;
+option java_multiple_files = true;
+option java_package = "com.parqis.ms3.integrations.proto";
+
+service ParkingSpotService {
+  rpc CheckAvailability (AvailabilityRequest) returns (AvailabilityResponse);
+  rpc ReserveSpot (ReserveSpotRequest) returns (ReserveSpotResponse);
+  rpc ReleaseSpot (ReleaseSpotRequest) returns (ReleaseSpotResponse);
+}
+
+message AvailabilityRequest {
+  string parking_lot_id = 1;
+}
+
+message AvailabilityResponse {
+  string parking_lot_id = 1;
+  int32 total_spots = 2;
+  int32 available_spots = 3;
+  bool has_availability = 4;
+}
+
+message ReserveSpotRequest {
+  string parking_lot_id = 1;
+}
+
+message ReserveSpotResponse {
+  bool success = 1;
+  string spot_id = 2;
+  string message = 3;
+}
+
+message ReleaseSpotRequest {
+  string spot_id = 1;
+}
+
+message ReleaseSpotResponse {
+  bool success = 1;
+  string spot_id = 2;
+  string message = 3;
+}

@@ -17,7 +17,7 @@ Parqis je digitalni sistem za upravljanje parkirišč, ki omogoča rezervacijo p
 Sistem sestavljajo **3 mikrostoritve**:
 - **MS1 - Rezervacije** (Node.js/Express) - upravljanje rezervacij in uporabnikov ✅
 - **MS2 - Parkirna mesta** (Python/FastAPI) - upravljanje inventarja mest ✅
-- **MS3 - Validacija** (Java/Spring Boot) - validacija vstopov/izstopov ⏳
+- **MS3 - Validacija** (Java/Spring Boot) - validacija vstopov/izstopov ✅
 
 **Komunikacija:**
 - REST API za synchronous komunikacijo
@@ -57,6 +57,7 @@ docker-compose logs -f ms1-reservations
 **Dostop:**
 - MS1 API: http://localhost:3000
 - MS2 API: http://localhost:8000
+- MS3 API: http://localhost:8080
 - Swagger UI: http://localhost:3000/api-docs
 - Health check: http://localhost:3000/api/health
 
@@ -118,11 +119,16 @@ docker-compose exec ms1-reservations npm test
 - ✅ Unit testi (pytest)
 - ✅ Dockerfile in docker-compose integracija
 
-### ⏳ MS3 - Validacija (PLANNED)
-- OCR prepoznavanje registrskih oznak
-- Validacija rezervacij
-- gRPC client za MS2
-- REST client za MS1
+### ✅ MS3 - Validacija (COMPLETED)
+- ✅ Screaming architecture po domenah (`validation`, `integrations`, `platform`)
+- ✅ REST API za vstop/izstop + validacije + kršitve
+- ✅ API key zaščita za simulator/internal klice
+- ✅ gRPC client do MS2 (`CheckAvailability`)
+- ✅ Kafka producer (`parking.started`, `parking.completed`, `parking.violation`)
+- ✅ Kafka listener za reservation evente
+- ✅ Structured JSON logging
+- ✅ Unit testi (JUnit + Mockito)
+- ✅ Dockerfile in docker-compose integracija
 
 ### ⏳ Web UI (PLANNED)
 - Next.js aplikacija
@@ -181,7 +187,10 @@ GitHub Actions workflow avtomatsko izvede ob push:
 - ✅ TypeScript build
 - ✅ Docker image build
 
-Workflow: [.github/workflows/ms1-test.yml](.github/workflows/ms1-test.yml)
+Workflow-i:
+- [.github/workflows/ms1-test.yml](.github/workflows/ms1-test.yml)
+- [.github/workflows/ms2-test.yml](.github/workflows/ms2-test.yml)
+- [.github/workflows/ms3-test.yml](.github/workflows/ms3-test.yml)
 
 ## 🎯 Git Push za teste
 

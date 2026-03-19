@@ -39,6 +39,26 @@ services:
     networks:
       - parqis-network
 
+  # PostgreSQL Database for MS3
+  postgres-ms3:
+    image: postgres:15-alpine
+    container_name: parqis-postgres-ms3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: validation
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-ms3-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - parqis-network
+
   # Zookeeper for Kafka
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -171,6 +191,43 @@ services:
     networks:
       - parqis-network
 
+  # MS3 - Validation Microservice
+  ms3-validation:
+    build:
+      context: ./ms3-validation
+      dockerfile: Dockerfile
+    container_name: parqis-ms3-validation
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-ms3:5432/validation
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_GROUP_ID: ms3-validation-group
+      KAFKA_PARKING_EVENTS_TOPIC: parking-events
+      KAFKA_RESERVATIONS_TOPIC: reservations
+      MS2_GRPC_HOST: ms2-parking-spots
+      MS2_GRPC_PORT: 50051
+      API_KEY: ${MS3_API_KEY:-ms3-simulator-api-key-change-me}
+    depends_on:
+      postgres-ms3:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      ms2-parking-spots:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - parqis-network
+
   # Kafka UI (optional - for development/debugging)
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -192,6 +249,8 @@ volumes:
   postgres-ms1-data:
     driver: local
   postgres-ms2-data:
+    driver: local
+  postgres-ms3-data:
     driver: local
   redis-data:
     driver: local

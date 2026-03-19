@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: ms3-validation
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/validation}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_GROUP_ID:ms3-validation-group}
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  security:
+    api-key: ${API_KEY:ms3-simulator-api-key-change-me}
+  ms2:
+    host: ${MS2_GRPC_HOST:localhost}
+    port: ${MS2_GRPC_PORT:50051}
+  kafka:
+    parking-events-topic: ${KAFKA_PARKING_EVENTS_TOPIC:parking-events}
+    reservations-topic: ${KAFKA_RESERVATIONS_TOPIC:reservations}
+
+logging:
+  level:
+    root: INFO
+    com.parqis.ms3: INFO
+  pattern:
+    console: "{\"timestamp\":\"%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}\",\"level\":\"%p\",\"service\":\"ms3-validation\",\"logger\":\"%logger{36}\",\"message\":\"%replace(%msg){'\"','\\\"'}\"}%n"
